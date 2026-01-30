@@ -1,24 +1,35 @@
 // DB에 넣을 데이터 (통신 없이 화면에서 사용)
 const KEYWORDS = {
+  // Backend
   "nodejs": "Node.js",
   "adonisjs": "AdonisJS",
-  "mysql": "MySQL",
   "typescript": "TypeScript",
-  "exceljs": "ExcelJS",
-  "minizipasmjs": "minizip-asm.js",
-  "s3": "S3",
+  "expressjs": "Express.js",
+  "ejs": "EJS", // 서버사이드 템플릿
+  // DB
+  "mysql": "MySQL",
+  "mssql": "MsSQL",
+  // API
   "googleadsapi": "Google Ads API",
   "instagramgraphapi": "Instagram Graph API",
-  "serverless": "Serverless",
-  "lambda": "Lambda",
-  "docker": "Docker",
+  // Frontend
   "vuejs": "Vue.js",
   "echarts": "ECharts",
   "vueecharts": "Vue ECharts",
+  "chartjs": "Chart.js",
+  // File
+  "s3": "S3",
+  "exceljs": "ExcelJS",
+  "minizipasmjs": "minizip-asm.js",
+  // etc
+  "serverless": "Serverless", // Serverless
+  "lambda": "Lambda", // AWS
+  "docker": "Docker", // Docker
 }
 
 const COMPANY = {
   "mediance": "미디언스",
+  "qed": "큐이디"
 }
 
 const SERVICE_NAME = {
@@ -27,6 +38,7 @@ const SERVICE_NAME = {
   "mediancelap": "미디언스 랩",
   "mediancebiz": "미디언스 비즈센터",
   "medianceadmin": "미디언스 관리자",
+  "qed": "큐이디",
 }
 
 const DATABASE = {
@@ -420,5 +432,150 @@ https://velog.io/@flobeeee/adonis-custom-primary-key
 5. 크롤링 타겟 목록 API 및 화면
 6. 인스타그램 계정 상태 통계 화면
 `
-    }]
+    },
+    {
+      "idx": 12,
+      "title": "평가모드 리포트 개발",
+      "company": COMPANY.qed,
+      "serviceName": SERVICE_NAME.qed,
+      "startMonth": "202303",
+      "endMonth": "202303",
+      "keywords": [
+        KEYWORDS.nodejs, 
+        KEYWORDS.expressjs,
+        KEYWORDS.mssql,
+        KEYWORDS.chartjs,
+        KEYWORDS.ejs,
+      ],
+      "content": `
+<개요>
+골프테스트를 진행한 후 데이터를 바탕으로 통계를 보여줌
+(인바디측정후 상담받듯이 인쇄해서 프로들이 골프상담에 활용)
+
+<작업사항>
+API 생성
+ejs로 화면 생성
+css 작업 
+→ 빠른완성을 위해 백엔드 서버에서 모두 진행
+
+<작업 순서>
+1. 데이터파악 및 기준 정리
+2. API 만들기
+-전체, 성별, 나이, 매장 랭킹관련 쿼리 생성
+3. 화면 만들기
+-차트 그리기
+-테이블 그리기
+4. 데이터 뿌리기
+-차트와 데이터 연결
+-데이터 다듬기 (화살표 이미지 적용 등)
+5. 피드백 받아서 유지보수
+-회원의 거리, 속도 단위 설정(미터, 야드 등)에 따라 데이터 표시 수정
+6. css 적용
+-인쇄 A4 2장
+`
+    },
+    {
+      "idx": 13,
+      "title": "마이데이터",
+      "company": COMPANY.qed,
+      "serviceName": SERVICE_NAME.qed,
+      "startMonth": "202304",
+      "endMonth": "202304",
+      "keywords": [
+        KEYWORDS.nodejs, 
+        KEYWORDS.expressjs,
+        KEYWORDS.mssql,
+      ],
+      "content": `
+<작업사항>
+1. 연습량(성별 구분 X)
+2. 평가모드
+3. 비거리랭킹(성별 구분 O)
+
+<특이사항>
+1. 앱개발자와 첫 작업
+앱은 한 화면 기준으로 API 만듬(프론트는 기능별로 API 만듬)
+헤더로 언어정보를 받아서, 언어에 따라 데이터 변환 후 res 보내줌
+2. 게임종료 → 커맨드 발생 → 연습량 반영
+3. 새벽마다 커맨드가 돌아서 비거리 랭킹반영됨
+회원정보에서 사용자가 성별을 바꿀 수 있음
+비거리랭킹의 경우, 커맨드가 도는 순간의 사용자 성별 확인해서 랭킹 산출함
+
+<속도개선 (전국 비거리 랭킹)>
+1. 0.297 sec
+매장별 내 순위를 뽑고,LEFT JOIN  매장별 1등 기록 가져옴    
+2. 0.078 sec
+WITH AS 로 임시테이블(해당 주차 랭킹)을 만들고
+내 기록을 가져오고 LEFT JOIN 매장별 1등 기록 가져옴
+3. 0.015 sec
+WITH AS 로 임시테이블(해당 주차 랭킹)을 만들고
+내 기록을 가져오고 sub query 로 매장별 1등 기록 가져옴
+
+<이슈사항>
+1. 쿼리 syntax 에러 (rank가 실행어로 인식돼서 에러남)
+IFNULL(rank, CONVERT(0, UNSIGNED)) AS rank
+→ IFNULL(rd.rank, CONVERT(0, UNSIGNED)) AS \\'rank'\\
+2. replaceAll is not function에러 (replaceAll은 node 15버전 이상에서만 가능)
+str.replaceAll('\\n', ' ')
+→ str.replace(/\\n/g,' ')
+→ join, split쓰는 방법도 있음
+`
+    },
+    {
+      "idx": 14,
+      "title": "앱 리뉴얼",
+      "company": COMPANY.qed,
+      "serviceName": SERVICE_NAME.qed,
+      "startMonth": "202306",
+      "endMonth": "202310",
+      "keywords": [
+        KEYWORDS.nodejs,
+        KEYWORDS.expressjs,
+        KEYWORDS.mssql,
+      ],
+      "content": `
+<개요>
+TGX매장과 QED매장 앱 서버 분리 목적
+기존서버와 동일하게 쓰는 API 옮기기 작업
+QED매장 앱 리뉴얼로 신규 API 생성
+
+<작업 사항>
+1. 로그인, 예약 등 83개 API 수정 및 생성
+
+<신규 서버에서 고려한 것>
+1. 응답 res 형식 통일
+    - 예시
+  // 응답 성공
+  {
+    "result": true,
+    "resultCode": 1,
+    "resultMsg": "조회하였습니다.",
+    "data": []
+  }
+  // 응답 실패
+  {
+    "result": false,
+    "resultCode": 9999,
+    "resultMsg": "매장 운영시간을 확인하세요.",
+    "data": []
+  }        
+2. 예약관련 res data 형식 통일
+3. 기능별로 키워드를 나눠서 라우터, 서비스, 모듈 폴더명, 파일명 통일
+4. ticket, voucher 등 혼용되어 쓰는 param 값 통일
+5. DELETE 메소드 모두 POST 메소드로 변경 (보안을 위해 body에 삭제할 데이터 받음)
+6. 유효성검사 메시지, admin 페이지에서 관리할 수 있게 데이터 연동 (기존에 하드코딩)
+7. 필수 param,query 확인하는 로직 생성
+8. 앱단에서 쓰는 데이터만 내려주기 (기존에는 DB에서 가져온 모든 데이터 보냄)
+9. SQL문에서 실행어는 대문자 그 외에는 소문자로 작성
+
+<이슈 사항>
+1. 디자이너 부재로 인해 기획자가 만든 figma로만 기능파악.
+→ 화면단위로 API를 만들어서, 화면확인 후 기능에 대한 내용 기획자와 논의 후 진행
+2. figma 잦은 수정으로, API 수정 발생
+→ figma 작업 끝났다고 확정받은 기능을 우선적으로 작업 진행
+3. 백엔드, 앱 동시 개발 진행
+→ API 작업이 오래 걸릴 거 같은 기능은 res 앱개발자에게 미리 샘플 res 공유
+`
+    }
+  ]
 };
