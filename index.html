@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>기술스택정리</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="wrapper">
+    <header class="header">
+      <h1>기술스택정리</h1>
+      <p class="subtitle">프로젝트 목록</p>
+    </header>
+
+    <main class="main">
+      <div class="table-wrap">
+        <table class="board-table">
+          <thead>
+            <tr>
+              <th class="col-idx">No</th>
+              <th class="col-title">제목</th>
+              <th class="col-company">회사</th>
+              <th class="col-serviceName">서비스명</th>
+              <th class="col-startMonth">시작월</th>
+              <th class="col-endMonth">종료월</th>
+              <th class="col-keywords">키워드</th>
+            </tr>
+          </thead>
+          <tbody id="board-body">
+            <!-- script.js에서 동적 생성 -->
+          </tbody>
+        </table>
+      </div>
+
+      <div id="detail-panels">
+        <!-- 토글 상세 내용은 각 행 아래에 script로 삽입 -->
+      </div>
+    </main>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
