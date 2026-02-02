@@ -5,10 +5,13 @@ const KEYWORDS = {
   "adonisjs": "AdonisJS",
   "typescript": "TypeScript",
   "expressjs": "Express.js",
+  "nodeschedule": "node-schedule",
+  "sql": "SQL",
   "ejs": "EJS", // 서버사이드 템플릿
   // DB
   "mysql": "MySQL",
   "mssql": "MsSQL",
+  "mongodb": "MongoDB",
   // API
   "googleadsapi": "Google Ads API",
   "instagramgraphapi": "Instagram Graph API",
@@ -17,6 +20,7 @@ const KEYWORDS = {
   "echarts": "ECharts",
   "vueecharts": "Vue ECharts",
   "chartjs": "Chart.js",
+  "firebaseadmin": "Firebase Admin",
   // File
   "s3": "S3",
   "exceljs": "ExcelJS",
@@ -576,6 +580,264 @@ QED매장 앱 리뉴얼로 신규 API 생성
 3. 백엔드, 앱 동시 개발 진행
 → API 작업이 오래 걸릴 거 같은 기능은 res 앱개발자에게 미리 샘플 res 공유
 `
+    },
+    {
+      "idx": 15,
+      "title": "어프로치/퍼팅 레인지",
+      "company": COMPANY.qed,
+      "serviceName": SERVICE_NAME.qed,
+      "startMonth": "202311",
+      "endMonth": "202311",
+      "keywords": [
+        KEYWORDS.nodejs,
+        KEYWORDS.expressjs,
+        KEYWORDS.mssql,
+        KEYWORDS.mongodb,
+      ],
+      "content": `
+<개요>
+기존에는 앱에 드라이빙레인지 관련 화면만 존재.
+드라이빙레인지 화면 + 드라이빙/어프로치/퍼팅 데이터 반영
+어프로치 레인지, 퍼팅 레인지 화면이 새로 만들어지면서 DB에서 데이터 분리 및 신규 API 생성 필요
+단, TGX앱은 기존처럼 드라이빙레인지 화면 + 드라이빙/어프로치/퍼팅 레인지 데이터 반영
+QED앱 이전버전은 드라이빙레인지 화면 + 드라이빙 데이터만 반영 (문의오면 앱 업그레이드 안내)
+
+<드라이빙레인지와 다른점>
+1. 드라이빙레인지는 비거리 위주로 데이터 구성되어 있음
+어프로치/퍼팅레인지는 목표거리 기준 정확도 위주로 구성되어 있음
+2. 드라이빙레인지는 골프클럽 필터로 데이터를 확인할 수 있음
+어프로치/퍼팅레인지는 목표거리 필터로 데이터를 확인할 수 있음 
+
+<특이사항>
+1. 어프로치레인지 화면 첫 진입시, 가장 최근에 친 샷의 목표거리를 조회해서 해당 데이터 리턴
+(퍼팅레인지 동일)
+2. DB 분리에 따라 연습량 화면에서 기존에 드라이빙레인지 샷 수만 표기됨
+ 어프로치/퍼팅레인지 샷은 반영 안됨. (사이드 이펙트)
+→ 어프로치/퍼팅레인지 테이블에서 샷 수 가져오기
+`
+    },
+    {
+      "idx": 16,
+      "title": "익일운영",
+      "company": COMPANY.qed,
+      "serviceName": SERVICE_NAME.qed,
+      "startMonth": "202312",
+      "endMonth": "202312",
+      "keywords": [
+        KEYWORDS.nodejs,
+        KEYWORDS.expressjs,
+        KEYWORDS.mssql,
+      ],
+      "content": `
+<개요>
+기존에는 당일운영 방식으로 매장을 운영해서 시간데이터를 00:00 ~ 23:59 방식으로 운영함
+익일운영 수요에 따라 08:00 ~ 다음날 07:59방식도 가능하게 변경 필요
+
+<작업 사항>
+1. DB에 익일컬럼을 추가해서, 매장 정보를 가져와서 유효성검사에 활용
+2. 예약할때 선택할 수 있는 타임테이블 수정
+오늘 익일 운영하면 다음날 새벽시간 타임테이블도 선택할 수 있어야함
+3. 매장시간, 이용권시간 둘 다 익일운영인지 유효성검사 필요
+기본적으로 매장, 이용권 시간 중 start time이 늦은 시간 기준으로 로직 진행
+
+매장(익일O), 이용권(익일O) → 매장과 이용권 시간 중 end time이 빠른 시간 기준으로 로직진행
+매장(익일O), 이용권(익일X) → 이용권 시간으로 로직진행
+매장(익일X), 이용권(익일O) → 매장 시간으로 로직진행
+매장(익일X), 이용권(익일X) → 기존과 동일
+
+<특이 사항>
+1. 서버시간은 UTC +0:00 이여서, 로컬(UTC +9:00)과 다름
+2. 매장시간은 한국시간(UTC +9:00) 기준으로 DB에 저장되어 있음
+3. 예약시간은 UTC +0:00 기준으로 DB에 저장되어 있음
+4. 예약시간은 클라이언트에서 unix 형식으로 보냄
+5. 레슨예약의 경우, 프로의 근무시간/정기휴일/비정기휴일 확인필요
+
+<아쉬운 점>
+- 수요예측에 실패하여, 실제 해당 옵션 사용하는 매장 없음
+`
+    },
+    {
+      "idx": 17,
+      "title": "APP PUSH 시스템 구축 및 운영",
+      "company": COMPANY.qed,
+      "serviceName": SERVICE_NAME.qed,
+      "startMonth": "202401",
+      "endMonth": "202402",
+      "keywords": [
+        KEYWORDS.nodejs,
+        KEYWORDS.expressjs,
+        KEYWORDS.mssql,
+        KEYWORDS.nodeschedule,
+        KEYWORDS.firebaseadmin,
+      ],
+      "content": `
+<개요>
+회원에게 푸시알림
+1. 큐이디 어플 실행 목적
+2. 매장 방문 독려 목적
+
+<프로세스>
+1. 특정 시간에 커맨드를 돌려서 DB에 앱푸시할 데이터 쌓음(ready 상태)
+2. 2분마다 앱푸시 예약시간 확인하는 커맨드 존재. 예약시간에 맞는 앱푸시 큐에 넣기
+3. 파이어베이스에 발송 요청
+---
+1. 앱에 푸시 발송됨
+2. 푸시 결과상태 받아서 DB에 업데이트 처리(success, fail 상태)
+단 success의 경우 성공적으로 알림이 울린 게 아닌, 전송이 수락되었다는 의미
+
+<특이사항>
+1. 라이브서버의 경우 2개의 클러스터가 존재.
+스테이지서버는 1개의 클러스터가 존재.
+스테이지서버에서 라이브 DB를 바라보고 있어서
+스테이지서버에서 커맨드 실행하는 걸로 처리
+(클러스터를 구분해서 커맨드 실행하는 방법도 있지만
+기존에 존재하지 않는 pm2 설정파일을 생성해서 서버를 시작해야 해서
+스테이지에서 실행하는 차선책 선택)
+2. 파이어베이스의 경우 1분당 400개까지 푸시 요청 가능해서
+2분 단위로 400개의 요청을 함.
+3. 정책적으로 메시지 타입에 따른 푸시동의(기본알림, 마케팅알림 등)를 한 회원에게만 발송
+4. 앱버전에 따라 알림을 누르면 새로운 페이지로 이동해서 
+특정 앱버전 이상 회원에게만 앱푸시 발송
+5. 앱에 로그인 시 유저의 fcm token 업데이트함. 
+한 기기에 하나의 fcm token 관계 관리
+같은 기기에 다른 회원 로그인 시 기존 회원의 fcm token 삭제처리 필요
+6. 중복으로 처리하지 않기 위해 큐에 데이터 없는 경우에만 데이터 넣음.
+7. admin 서버와 app 서버가 따로 있어서 큐도 분리해서 만듬
+
+<성능개선>
+꾸준한 쿼리튜닝으로 24.03.22에 CPU 안정화
+기존 5분동안 CPU 사용 → 2분 30초로 축소
+기존 CPU 54% → 8%로 절감
+`
+    },
+    {
+      "idx": 18,
+      "title": "회원조회 쿼리튜닝(8초 → 0.6초)",
+      "company": COMPANY.qed,
+      "serviceName": SERVICE_NAME.qed,
+      "startMonth": "202401",
+      "endMonth": "202402",
+      "keywords": [
+        KEYWORDS.nodejs,
+        KEYWORDS.expressjs,
+        KEYWORDS.mssql,
+        KEYWORDS.sql,
+      ],
+      "content": `
+<개요>
+마지막 방문이 3일 전인 유저 리스트를 조회 하는 쿼리가 8초가량 소요
+마케팅용 앱푸시 목적
+오늘이 4일이고, 1일이 마지막 방문일인 경우 조건에 해당
+
+- 8초 소요(NOT IN 문에서 소요 큼)
+1) 2024.01.01 이용기록이 있는 경우
+2) 2024.01.01 이후에 이용기록이 없는 경우
+SELECT *
+FROM 이용내역
+  WHERE 이용내역.사용일자 = '20240101'
+    AND 이용내역.매장유저아이디 NOT IN (
+      SELECT 이용내역.매장유저아이디
+      FROM 이용내역
+      WHERE 이용내역.사용일자 > '20240101'
+    );
+
+- 2.5초 소요(NOT IN 문에서 소요 큼)
+1) 임시테이블 2개 사용
+WITH use_user AS (
+	SELECT 이용내역.매장유저아이디 AS 매장유저아이디
+	FROM 이용내역
+	WHERE 이용내역.사용일자 = '20240101'
+), recent_use_user AS (
+	SELECT 이용내역.매장유저아이디 AS 매장유저아이디
+	FROM 이용내역
+	WHERE 이용내역.사용일자 > '20240101'
+)
+SELECT *
+FROM 매장유저
+INNER JOIN use_user ON 매장유저.매장유저아이디 = use_user.매장유저아이디 
+WHERE 
+		매장유저.매장유저아이디  NOT IN (
+			SELECT 매장유저아이디 
+      FROM recent_use_user
+    );
+
+- 2.3초 소요(NOT IN 문에서 소요 큼)
+1) 임시테이블에서 NOT IN 절 사용
+WITH use_user AS (
+	SELECT 이용내역.매장유저아이디 AS 매장유저아이디
+	FROM 이용내역
+	WHERE 이용내역.사용일자 = '20240101'
+    AND 매장유저아이디 NOT IN (
+		  SELECT 이용내역.매장유저아이디 AS 매장유저아이디
+	    FROM 이용내역
+	    WHERE 이용내역.사용일자 > '20240101'
+    )
+)
+SELECT *
+FROM 매장유저
+INNER JOIN use_user ON 매장유저.매장유저아이디 = use_user.매장유저아이디;
+
+- 0.6초 소요
+1) > 기호를 = 기호로 변경
+ WITH use_user AS (
+	SELECT 이용내역.매장유저아이디 AS 매장유저아이디
+	FROM 이용내역
+	WHERE 이용내역.사용일자 = '20240101'
+	AND 매장유저아이디 NOT IN (
+		SELECT 이용내역.매장유저아이디 AS 매장유저아이디
+	  FROM 이용내역
+		WHERE 사용일자 = DATE_FORMAT(DATE_ADD( '20240101', INTERVAL 1 DAY), '%Y%m%d')
+	)
+	AND 매장유저아이디 NOT IN (
+		SELECT 이용내역.매장유저아이디 AS 매장유저아이디
+	  FROM 이용내역
+		WHERE 사용일자 = DATE_FORMAT(DATE_ADD( '20240101', INTERVAL 2 DAY), '%Y%m%d')
+	)
+	AND 매장유저아이디 NOT IN (
+	  SELECT 이용내역.매장유저아이디 AS 매장유저아이디
+	  FROM 이용내역
+		WHERE 사용일자 = DATE_FORMAT(DATE_ADD( '20240101', INTERVAL 3 DAY), '%Y%m%d')
+	)
+)
+SELECT *
+FROM 매장유저
+INNER JOIN use_user ON 매장유저.매장유저아이디 = use_user.매장유저아이디;
+`
+    },
+    {
+      "idx": 19,
+      "title": "라운드 데이터 저장",
+      "company": COMPANY.qed,
+      "serviceName": SERVICE_NAME.qed,
+      "startMonth": "202404",
+      "endMonth": "202404",
+      "keywords": [
+        KEYWORDS.nodejs,
+        KEYWORDS.expressjs,
+        KEYWORDS.mssql,
+      ],
+      "content": `
+<개요>
+1. 기존에 게임 내에서 라운드 모드가 있었지만, DB에 데이터가 저장되지 않았음
+2. 연습관련 기능 개편이 마무리 되어, 라운드 기록을 저장하는 기능 개발 진행
+
+<작업사항>
+1. 라운드 홈 조회 API
+2. 라운드 목록 조회 API
+3. 라운드 상세 조회 API
+
+<작업시 유의점>
+1. 큐이디는 9홀이 기본임. 
+라운드 홈화면 진입시 9홀 데이터만 있는 경우, 9홀 화면으로 진입.
+그 외에는 18홀 화면으로 진입
+2. 오각형 그래프상 숫자가 적어야 좋은 경우 존재
+min, max 값 주의해서 res 리턴
+3. 라운드 메인 테이블에 shot_count 가 null이면 게임이 마무리 되지 않았다는 의미
+리스트 조회 쿼리에서 shot_count IS NOT NULL 조건문 필수
+4. 라운드 상세 조회 API에서 ‘내 기록’이 맨 위에 위치
+그 밑으로 팀원 기록은 점수순으로 정렬
+`
     }
+    
   ]
 };
