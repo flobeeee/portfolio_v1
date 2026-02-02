@@ -3,15 +3,19 @@ const KEYWORDS = {
   // Backend
   "nodejs": "Node.js",
   "adonisjs": "AdonisJS",
+  "nestjs": "NestJS",
   "typescript": "TypeScript",
   "expressjs": "Express.js",
   "nodeschedule": "node-schedule",
+  "cron": "Cron",
   "sql": "SQL",
   "ejs": "EJS", // 서버사이드 템플릿
   // DB
   "mysql": "MySQL",
   "mssql": "MsSQL",
   "mongodb": "MongoDB",
+  "typeorm": "TypeORM",
+  "mybatis": "MyBatis",
   // API
   "googleadsapi": "Google Ads API",
   "instagramgraphapi": "Instagram Graph API",
@@ -29,11 +33,14 @@ const KEYWORDS = {
   "serverless": "Serverless", // Serverless
   "lambda": "Lambda", // AWS
   "docker": "Docker", // Docker
+  "externalapi": "외부업체 API",
+  "webhook": "Webhook",
 }
 
 const COMPANY = {
   "mediance": "미디언스",
-  "qed": "큐이디"
+  "qed": "큐이디",
+  "H2BIZ": "H2BIZ"
 }
 
 const SERVICE_NAME = {
@@ -43,6 +50,8 @@ const SERVICE_NAME = {
   "mediancebiz": "미디언스 비즈센터",
   "medianceadmin": "미디언스 관리자",
   "qed": "큐이디",
+  "esaro": "이사로",
+  "bomulsun": "보물선",
 }
 
 const DATABASE = {
@@ -837,7 +846,356 @@ min, max 값 주의해서 res 리턴
 4. 라운드 상세 조회 API에서 ‘내 기록’이 맨 위에 위치
 그 밑으로 팀원 기록은 점수순으로 정렬
 `
+    },
+    {
+      "idx": 20,
+      "title": "리뉴얼(1차) - 메인로직 개편",
+      "company": COMPANY.H2BIZ,
+      "serviceName": SERVICE_NAME.esaro,
+      "startMonth": "202408",
+      "endMonth": "202504",
+      "keywords": [
+        KEYWORDS.nodejs,
+        KEYWORDS.nestjs,
+        KEYWORDS.typeorm,
+        KEYWORDS.mssql,
+      ],
+      "content": `
+<개요>
+앱 리뉴얼에 따라 모든 API 로직 및 res 수정
+서비스 메인로직 수정
+쿠폰 기능 개발
+알림톡 메세지, 로직 전면 개편
+
+<주요 작업사항>
+1. 전반적인 타임라인 변경에 따라 메인로직 관련 배치 전면 수정 ⭐⭐⭐⭐⭐
+- 긴급오더의 경우, 계약금을 받지 않는 프로세스로 변경
+- 알림톡 템플릿 재검수 후 관련 로직 생성/수정 (총 12건)
+
+<프로세스>
+1. 고객이 이사관련 정보 등록
+2. 기사가 대략적인 견적 넣음
+3. 고객이 여러 견적 중 하나를 선택
+4. 기사가 최종 수락
+5. 고객이 계약금 지불
+6. 이사 후 기사가 잔금결제 요청
+7. 고객이 잔금결제
+8. 고객이 리뷰작성
+⇒ 긴급오더의 경우, 3번 4번 순서 건너뜀 (고객이 견적보고 바로 계약금 지불)
+
+<어려웠던 점>
+1. 프로세스마다 오더와 견적에 정의된 상태값이 있음
+2. 순서가 건너뛴다고 상태를 건너뛰는 게 아닌, 해당 프로세스 로직을 다 태워야함
+3. 일반적인 경우, '계약금대기'상태가 되면 더이상의 견적을 받지 못하게  처리함
+4. 긴급오더의 경우, 견적을 받는 즉시 계약금대기상태가 되기 때문에 예외처리 필요
+5. 고객이 계약금 입금 하면, 나머지 견적 '선택안됨' 상태 처리
+`
+    },
+    {
+      "idx": 21,
+      "title": "리뉴얼(1차) - 쿠폰 기능 개발",
+      "company": COMPANY.H2BIZ,
+      "serviceName": SERVICE_NAME.esaro,
+      "startMonth": "202408",
+      "endMonth": "202504",
+      "keywords": [
+        KEYWORDS.nodejs,
+        KEYWORDS.nestjs,
+        KEYWORDS.typeorm,
+        KEYWORDS.mssql,
+      ],
+      "content": `
+<개요>
+- 개요
+앱 리뉴얼에 따라 모든 API 로직 및 res 수정
+서비스 메인로직 수정
+쿠폰 기능 개발
+
+<고려한 사항>
+- 쿠폰상태(발급대기 발급중 기한만료 발급중지)
+1-1. 배치로 처리
+1-1-1. 발급대기 → 발급중
+1-1-2. 발급중 → 기한만료
+1-2. API로 처리
+1-2-1. 발급중지
+
+- 제한이 없는 경우
+2-1. 사용기간에 제한이 없는 경우, 9999-12-31 만료일자로 저장
+2-2. 발급수량에 제한이 없는 경우, -1로 저장
+
+- 쿠폰종류
+3-1. 목록에서 버튼클릭을 통해 다운받는 쿠폰
+3-2. 특정 코드 입력을 통해 등록하는 쿠폰
+3-3. 정률할인/정액할인 ⭐⭐⭐⭐⭐
+
+- 쿠폰적용에 따라 관리한 금액
+4-1. 총 금액: 쿠폰 적용 후의 최종 결제 금액
+4-2. 할인된 계약금: 할인 적용 후의 계약금
+4-3. 할인된 잔금: 할인 적용 후의 잔금
+4-4. 계약금에 적용한 할인 금액: 계약금에 대해 적용된 할인 금액
+4-5. 총 금액에 적용한 할인 금액: 총 금액에 대해 적용된 할인 금액
+⇒ a = b + c + e
+
+<어려웠던 점>
+이사서비스의 경우, 결제가 2번 이루어짐(계약금, 잔금)    
+10% 쿠폰이 적용되는 경우, 결제금 계약할때 10% 할인이 적용됨
+그 후 이사를 진행하면서 이사금액이 바뀌는 경우가 있음
+이 경우, 잔금결제에 변경분을 계산해서 할인받는 금액을 계산해야함
+`
+    },
+    {
+      "idx": 22,
+      "title": "아파트아이-커넥트파이 연동(외부업체)",
+      "company": COMPANY.H2BIZ,
+      "serviceName": SERVICE_NAME.esaro,
+      "startMonth": "202503",
+      "endMonth": "202503",
+    "keywords": [
+      KEYWORDS.nodejs,
+      KEYWORDS.nestjs,
+      KEYWORDS.typeorm,
+      KEYWORDS.mssql,
+      KEYWORDS.externalapi,
+      KEYWORDS.webhook,
+    ],
+    "content": `
+<목적>
+1. 이사로 서비스를 외부 플랫폼에 노출 (고객전용 앱)
+2. 아파트아이 어플 내에 입점한 커넥트파이 업체와 서비스 연동
+
+<기본사항>
+1. 외부업체에서 오더 들어오는 경우, 
+해당 회원정보로 이사로 내 강제 회원가입 (최소한의 개인정보로)
+2. 이사로와 동일한 프로세스로 진행이 최우선이나 외부업체 로직과 다른점 존재
+3. 웹훅과 API 연동 및 히스토리 저장
+
+<고려한 사항>
+1. 오더 생성 웹훅 받은 후, 오더 조회하면 에러 뜸
+→ 딜레이 걸고 오더 조회 진행
+2. 외부업체와 로직이 다른 경우 존재
+외부업체가 여러서비스를 연동해두어서, 공통로직을 타는 부분이 존재하여
+가능한 선에서 협의 필요
+ex. 사진 depth,기한만료, 최소 금액 등
+
+<중요사항>⭐⭐⭐
+1. 이사로의 경우 견적금액 수정이 가능/ 커넥트 측은 불가능
+견적금액 외 추가금을 등록할 수 있는 기능 존재
+- 이사로의 견적 금액을 수정하는 경우 → 커넥트 추가금 생성 API 호출
+- 이사로 추가금액 등록하는 경우 → 커넥트 추가금 생성 API 호출
+2. 이사로의 경우 차량수, 작업인원 수정 가능/ 커넥트 측은 불가능
+커넥트측의 경우 견적에 대한 title 컬럼이 있음/ 이사로는 없음
+- 이사로의 차량수, 작업인원 수정하는 경우 → 커넥트 견적 title 수정 API 호출
+3. 커넥트 측의 경우 n시간동안 견적이 1건도 들어오지 않으면 오더 만료됨
+이사로의 경우 이사일 기준 -n시간에 오더 만료함
+- 커넥트 측에서 오더 만료시키는 경우, 이사로 오더도 만료시키는 걸로 협의
+- 기사 화면에서는 만료된 오더는 노출되지 않음
+⇒ 커넥트파이를 이용하는 회원에게만 짧은 만료기한
+4. 견적만료의 경우, 이사로가 만료시간을 커넥트측에 전달하면 그 시간에 만료로 진행
+
+<아쉬운 점>
+2025.10.28 커넥트파이 사업종료
+`
+    },
+    {
+      "idx": 23,
+      "title": "리뉴얼(2차) - 이벤트에 쿠폰 연동",
+      "company": COMPANY.H2BIZ,
+      "serviceName": SERVICE_NAME.esaro,
+      "startMonth": "202504",
+      "endMonth": "202506",
+      "keywords": [
+        KEYWORDS.nodejs,
+        KEYWORDS.nestjs,
+        KEYWORDS.typeorm,
+        KEYWORDS.mssql,
+      ],
+      "content": `
+<개요>
+1차 리뉴얼에 만든 쿠폰 기능을 이벤트에 연결
+정산관련 기능에 쿠폰관련 로직, 데이터 추가 ⭐⭐⭐⭐⭐
+
+<이벤트 관련 API 생성>
+1. 이벤트 생성
+2. 이벤트 수정
+3. 이벤트 목록 조회 (관리자용)
+4. 이벤트 목록 조회 (고객용)
+5. 이벤트 조회 상세 (고객용) - 조회수 올라가야함
+6. 배너 목록 등록 API
+7. 배너 목록 조회 API
+
+<수정한 정산관련 API>
+1. 정산 캘린더 - 매출리스트
+2. 정산 캘린더 - 예정, 확정 리스트
+3. 정산 통합 리스트/예정 리스트/확정 리스트
+4. 정산 상세
+5. 기사별 누적 정산
+
+<어려웠던점>
+쿠폰 적용 후 정산내역 계산식이 복잡함
+→ QA기간동안 테스트 함께 하는 인원에게 다양한 경우의수를 납득시켜야 함
+    1. 일정금액 할인
+    2. 일정금액 할인 + 추가금 생기는 경우
+    3. 퍼센트 할인
+    4. 퍼센트 할인 + 추가금 생기는 경우
+    5. 퍼센트 할인 + 추가금 생기는 경우 + 최대할인금액을 넘는 경우
+`
+    },
+    {
+      "idx": 24,
+      "title": "견적조회 쿼리튜닝(3초 → 0.5초)",
+      "company": COMPANY.H2BIZ,
+      "serviceName": SERVICE_NAME.esaro,
+      "startMonth": "202504",
+      "endMonth": "202506",
+      "keywords": [
+        KEYWORDS.nodejs,
+        KEYWORDS.nestjs,
+        KEYWORDS.typeorm,
+        KEYWORDS.mssql,
+        KEYWORDS.sql,
+      ],
+      "content": `
+<개요>
+견적 상세 조회하는 API가 3초가량 소요
+
+- 3초 소요(운반하는차량 항목에서 시간소모 큼)
+이 쿼리에서 vehicles를 포함하는 경우에만 local기준 3초가량 시간이 소요됐다.
+Index 가 잘 걸려있는지 확인했고, 문제 없었다.
+혹시 leftJoin이 많이 걸려서 그런가 하고 순서 바꿨는데, 소요시간에 변화가 없었다.
+저 데이터가 필수로 필요해서 무조건 가지고 와야했다.
+따로 쿼리를 한번 더 날렸다.
+const 견적 = await this.createQueryBuilder('견적')
+      .leftJoinAndSelect('견적.프로모션', '프로모션')
+      .leftJoinAndSelect('프로모션.프로모션지역', '프로모션지역')
+      .leftJoinAndSelect('견적.금액', '금액')
+      .leftJoinAndSelect('견적.타임라인', '타임라인')
+      .leftJoinAndSelect('견적.운반차', '운반차')
+      .leftJoinAndSelect('견적.직원', '직원')
+      .leftJoinAndSelect('견적.기사', '기사')
+      .leftJoinAndSelect('견적.주문', '주문')
+      .leftJoinAndSelect('기사.운반차조인테이블', '운반차조인테이블')
+      .leftJoinAndSelect('기사.리뷰', '리뷰', '리뷰.isHided = true')
+      .leftJoinAndSelect('기사.지역', '지역')
+      .leftJoinAndSelect('견적.쿠폰조인테이블', '쿠폰조인테이블')
+      .leftJoinAndSelect('쿠폰조인테이블.쿠폰', '쿠폰')
+      .leftJoinAndSelect('견적.결제', '결제')
+      .leftJoinAndSelect('견적.리뷰', '리뷰')
+      .andWhere('견적.id = :견적Id', { 견적Id })
+      .getOneOrFail();
+
+- 0.5초 소요 (변경후)
+const 견적운반차 = await this.createQueryBuilder('견적')
+      .leftJoinAndSelect('견적.운반차', '운반차')
+      .where('견적.id = :견적Id', { 견적Id })
+      .getOneOrFail();
+      
+let 견적 = await this.createQueryBuilder('견적')
+      .leftJoinAndSelect('견적.프로모션', '프로모션')
+      .leftJoinAndSelect('프로모션.프로모션지역', '프로모션지역')
+      .leftJoinAndSelect('견적.금액', '금액')
+      .leftJoinAndSelect('견적.타임라인', '타임라인')
+   // .leftJoinAndSelect('견적.운반차', '운반차')
+      .leftJoinAndSelect('견적.직원', '직원')
+      .leftJoinAndSelect('견적.기사', '기사')
+      .leftJoinAndSelect('견적.주문', '주문')
+      .leftJoinAndSelect('기사.운반차조인테이블', '운반차조인테이블')
+      .leftJoinAndSelect('기사.리뷰', '리뷰', '리뷰.isHided = true')
+      .leftJoinAndSelect('기사.지역', '지역')
+      .leftJoinAndSelect('견적.쿠폰조인테이블', '쿠폰조인테이블')
+      .leftJoinAndSelect('쿠폰조인테이블.쿠폰', '쿠폰')
+      .leftJoinAndSelect('견적.결제', '결제')
+      .leftJoinAndSelect('견적.리뷰', '리뷰')
+      .andWhere('견적.id = :견적Id', { 견적Id });
+
+견적.운반차 = 견적운반차.운반차; // 기존과 똑같은 데이터 형식으로 말기
+`
+    },
+    {
+      "idx": 25,
+      "title": "리뉴얼(3차) - 앱푸시",
+      "company": COMPANY.H2BIZ,
+      "serviceName": SERVICE_NAME.esaro,
+      "startMonth": "202507",
+      "endMonth": "202508",
+      "keywords": [
+        KEYWORDS.nodejs,
+        KEYWORDS.nestjs,
+        KEYWORDS.typeorm,
+        KEYWORDS.cron,
+      ],
+      "content": `
+<개요>
+앱푸시 항목 23가지 신규생성 ⭐⭐⭐
+항목에 따라 이동해야하는 앱 페이지 다름
+
+<특이사항>
+1. 앱푸시 광고/서비스알림 등 속성에 따라 확인해야 하는 알림 컬럼 다름
+2. 이벤트 발생 지점에 따라 1)API 호출 2)배치 로 나뉨
+3. 개발서버/운영서버 앱푸시관련 배치주기 다르게 처리 필요
+
+
+<어려웠던점>
+
+n시간마다 도는 배치, n시간 이후 조건으로 앱푸시 발생인 경우 현실시간으로 테스트 어려움
+→ 1분단위로 배치 실행시켜서 로직 타는지 확인
+→ 수동으로 DB 컬럼을 변경하여 테스트 진행
+앱푸시마다 이동해야하는 화면과 필요한 데이터가 달라서 꼼꼼한 작업 필요
+`
+    },
+    {
+      "idx": 26,
+      "title": "1월 에르메스 랜덤드롭 이벤트",
+      "company": COMPANY.H2BIZ,
+      "serviceName": SERVICE_NAME.bomulsun,
+      "startMonth": "202512",
+      "endMonth": "202512",
+      "keywords": [
+        KEYWORDS.nodejs,
+        KEYWORDS.expressjs,
+        KEYWORDS.mybatis,
+      ],
+      "content": `
+<개요>
+1. 골드상자 오픈시 일정확률로 티켓을 획득한다
+2. 티켓의 총 개수 100개, 상품의 총 개수 100개
+3. 명시된 비율에 따라 티켓으로 상품을 뽑을 수 있다
+
+<이슈>
+이벤트 관리 화면이 없어서 초기 데이터 입력 어려움
+-> 수동으로 DB에 데이터 입력(휴먼에러 발생 가능성 있음)
+-> 운영테스트시 데이터 잘못 입력되어 테스트진행 불가
+-> 활성화된 이벤트 조회 API로 데이터 확인해서 진행
+`
+    },
+    {
+      "idx": 27,
+      "title": "3월 주사위 게임 이벤트",
+      "company": COMPANY.H2BIZ,
+      "serviceName": SERVICE_NAME.bomulsun,
+      "startMonth": "202601",
+      "endMonth": "202601",
+      "keywords": [
+        KEYWORDS.nodejs,
+        KEYWORDS.expressjs,
+        KEYWORDS.mybatis,
+      ],
+      "content": `
+<개요>
+1. 골드상자 오픈시 확률에 따라 주사위 지급(티켓과 동일)
+2. 주사위는 수량제한 없음
+3. 주사위 보드판 위에 있는 상품을 뽑을 수 있다
+
+- 주사위사용
+1. 회원의 위치, 주사위 개수 조회 API호출
+2. Go 버튼을 누르면
+-주사위 차감
+-게임 API호출 1~6중에 랜덤숫자 뽑아서, 위치 + 지급상품 return
+3. 지급상품
+포인트: 회원의 포인트 증가, 이력 생성
+골드상자: 골드상자 개수 증가, 이력 생성
+배송쿠폰: 배송쿠폰 개수 증가, 이력 생성
+보너스: 보너스 상품 지급, 이력 생성
+`
     }
-    
   ]
 };
