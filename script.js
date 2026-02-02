@@ -2,9 +2,11 @@
   const PAGE_SIZE = 10;
   let currentPage = 1;
   let fullList = [];
+  let selectedCompany = null; // null = 전체
 
   let BOARD_BODY = document.getElementById("board-body");
   let PAGINATION_WRAP = document.getElementById("pagination-wrap");
+  let COMPANY_FILTER_WRAP = document.getElementById("company-filter-wrap");
 
   function escapeHtml(text) {
     let div = document.createElement("div");
@@ -30,11 +32,51 @@
     return fullList.slice(start, start + PAGE_SIZE);
   }
 
+  function getUniqueCompanies() {
+    const table = DATABASE.portfolioTable || [];
+    const set = new Set();
+    table.forEach(function (item) {
+      if (item.company) set.add(item.company);
+    });
+    return Array.from(set).sort();
+  }
+
+  function renderCompanyFilters() {
+    const companies = getUniqueCompanies();
+    let html = '<div class="company-filters">';
+    html += '<button type="button" class="filter-btn' + (selectedCompany === null ? ' active' : '') + '" data-company="">전체</button>';
+    companies.forEach(function (company) {
+      const active = selectedCompany === company ? ' active' : '';
+      html += '<button type="button" class="filter-btn' + active + '" data-company="' + escapeHtml(company) + '">' + escapeHtml(company) + "</button>";
+    });
+    html += "</div>";
+    COMPANY_FILTER_WRAP.innerHTML = html;
+    bindCompanyFilterClicks();
+  }
+
+  function bindCompanyFilterClicks() {
+    if (!COMPANY_FILTER_WRAP) return;
+    COMPANY_FILTER_WRAP.querySelectorAll(".filter-btn").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        const company = this.getAttribute("data-company") || null;
+        selectedCompany = company === "" ? null : company;
+        currentPage = 1;
+        loadAndRender();
+      });
+    });
+  }
+
   function loadAndRender() {
     fullList = (DATABASE.portfolioTable || []).slice();
+    if (selectedCompany) {
+      fullList = fullList.filter(function (item) {
+        return item.company === selectedCompany;
+      });
+    }
     fullList.sort(function (a, b) {
       return (b.idx - a.idx);
     });
+    renderCompanyFilters();
     if (fullList.length === 0) {
       BOARD_BODY.innerHTML =
         '<tr><td colspan="7" class="empty-message">등록된 항목이 없습니다.</td></tr>';
