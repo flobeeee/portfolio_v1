@@ -1192,5 +1192,59 @@ n시간마다 도는 배치, n시간 이후 조건으로 앱푸시 발생인 경
 - 결론: 방법2 선택. 화면 팝업 등 표시가 필요하고 이벤트 활성화 유무까지 확인하기 위해서, 결제API 수정 최소화
 `,
     },
+    {
+      idx: 29,
+      title: "4월 딱지치기 이벤트",
+      company: COMPANY.H2BIZ,
+      serviceName: SERVICE_NAME.bomulsun,
+      startMonth: "202603",
+      endMonth: "202603",
+      keywords: [KEYWORDS.nodejs, KEYWORDS.expressjs, KEYWORDS.mybatis],
+      content: `
+<개요>
+1. 골드상자 오픈시 확률에 따라 딱지 지급(티켓과 동일)
+2. 딱지 종류 3가지
+3. 딱지 종류별로 획득상품 상이
+
+<주의사항>
+1. 상자 1개에서 획득할 수 있는 딱지 수 최대 1개
+2. 기존 이벤트는 티켓종류가 1개였으나 3개로 증가되어 티켓 조회하는 쿼리 수정 필요(1건 -> 다건)
+`,
+    },
+    {
+      idx: 30,
+      title: "5월 주간랭킹전 이벤트",
+      company: COMPANY.H2BIZ,
+      serviceName: SERVICE_NAME.bomulsun,
+      startMonth: "202604",
+      endMonth: "202604",
+      keywords: [KEYWORDS.nodejs, KEYWORDS.expressjs, KEYWORDS.mybatis],
+      content: `
+<개요>
+1. 4주차까지 진행, 진행 시작요일/마감요일 다름
+2. 마감요일 다음 날 10:30 보상지급 + 푸시, 팝업
+3. 상자 오픈 횟수 랭킹 TOP5 (동일한 경우 먼저 오픈한 순)
+4. 실시간 조회 가능
+
+<주의사항>
+1. 개발서버에서 앱푸시 테스트가 불가한 환경이라 운영테스트에서 확인
+2. 스케줄러서버가 운영에만 세팅되어 있어서, 개발에서는 API 호출해서 보상지급 테스트 진행
+`,
+    },
+    {
+      idx: 31,
+      title: "6월 룰렛 이벤트",
+      company: COMPANY.H2BIZ,
+      serviceName: SERVICE_NAME.bomulsun,
+      startMonth: "202604",
+      endMonth: "202604",
+      keywords: [KEYWORDS.nodejs, KEYWORDS.expressjs, KEYWORDS.mybatis],
+      content: `
+<개요>
+1. 상자 1회 오픈시 상자 오픈 개수에 따라 룰렛 티켓 획득
+2. 룰렛을 돌려서 보상 획득
+3. 티켓 사용시 10개이하인 경우 한번에 1~10개까지 돌리기 가능
+`,
+    },
   ],
 };
