@@ -1246,5 +1246,26 @@ n시간마다 도는 배치, n시간 이후 조건으로 앱푸시 발생인 경
 3. 티켓 사용시 10개이하인 경우 한번에 1~10개까지 돌리기 가능
 `,
     },
+    {
+      idx: 32,
+      title: "관리자 리뉴얼",
+      company: COMPANY.H2BIZ,
+      serviceName: SERVICE_NAME.bomulsun,
+      startMonth: "202604",
+      endMonth: "202608",
+      keywords: [KEYWORDS.nodejs, KEYWORDS.nestjs],
+      content: `
+<개요>
+관리자 페이지 expressJS -> nestJS 로 기술스택 변경
+데이터베이스 구조 전면 개편
+관리자 모든 기능 신규개발
+사용자앱은 외주업체에서 리뉴얼 진행
+
+<주요 작업사항>
+1. 데이터베이스 설계관련 피드백/정리
+2. 사용자앱 관련 외주업체 소통
+3. 관리자 기능개발(클로드AI 활용)
+`,
+    },
   ],
 };
