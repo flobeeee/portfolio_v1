@@ -35,6 +35,8 @@ const KEYWORDS = {
   docker: "Docker", // Docker
   externalapi: "외부업체 API",
   webhook: "Webhook",
+  // ai
+  claude: "CLAUDE"
 };
 
 const COMPANY = {
@@ -1253,7 +1255,7 @@ n시간마다 도는 배치, n시간 이후 조건으로 앱푸시 발생인 경
       serviceName: SERVICE_NAME.bomulsun,
       startMonth: "202604",
       endMonth: "202608",
-      keywords: [KEYWORDS.nodejs, KEYWORDS.nestjs],
+      keywords: [KEYWORDS.nodejs, KEYWORDS.nestjs, KEYWORDS.claude],
       content: `
 <개요>
 관리자 페이지 expressJS -> nestJS 로 기술스택 변경
@@ -1265,6 +1267,37 @@ n시간마다 도는 배치, n시간 이후 조건으로 앱푸시 발생인 경
 1. 데이터베이스 설계관련 피드백/정리
 2. 사용자앱 관련 외주업체 소통
 3. 관리자 기능개발(클로드AI 활용)
+
+<진행도 관리 방법>
+약 200개 API 개편, 작업자 2명
+매주 월요일 회의를 통해 우선순위 높은 API 30~40개 선정
+주차별로 브랜치 생성 & 엑셀로 실시간 작업상태값(작업전,작업중,작업완료,보류,추가작업필요) 관리
+개별 API 작업하면서 기획팀과 소통, DB 수정 함께 진행
+
+<우선순위 기준>
+1. 상: 관리자 내에서 쌓는 데이터 위주의 API
+2. 중: 중요도 높은 기능 (seed 데이터 넣고 진행)
+3. 하: 중요도 낮거나 선작업이 필요한 API
+4. 최하: 스케줄러, 앱푸시 등 (제일 마지막에 진행)
+
+<클로드 활용 방법>
+[사전세팅]
+- 레포에 CLAUDE.md 작성 → 응답 형식·커밋 규칙·문서 구조 등 컨벤션을 강제 규칙으로 정해둠
+- 에이전트 역할 정의: backend-dev / frontend-dev / db-architect / planner / reviewer / tester (작성하는 폴더별로 분리)
+- DB 직접 적용은 사람만 — 마이그레이션 실행은 자동화 금지
+
+1. 명세 확정
+- 기획서 + 엔티티 명시해서 의뢰
+- Claude 가 기획서·코드 읽고 갭 발견 → 객관식으로 되묻기 (예: "DB 컬럼 추가 vs 기존 재사용?")
+- 사용자 답변으로 확정 명세 도출
+2. 병렬 위임
+- 도메인에 맞는 에이전트에 자동 분배 (DB → db-architect, API → backend-dev)
+- 독립 작업은 한 번에 병렬 실행
+- 프롬프트에 기획서 경로·참고 모듈·검증 명령까지 self-contained 로 명시
+3. 검증
+- 에이전트 보고만 믿지 않고 핵심 파일 직접 확인
+4. 커밋
+- git status/diff 점검 → 관련 문서 함께 갱신됐는지 확인 → 한 줄 메시지로 커밋
 `,
     },
   ],
